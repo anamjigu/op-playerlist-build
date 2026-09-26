@@ -1,0 +1,29 @@
+name: Build playerlist
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.2.0'
+      - name: Unzip and build
+        run: |
+          mkdir project
+          unzip op-playerlist-fabric-1.21.11-source.zip -d project
+          cd project
+          gradle build --stacktrace
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: op-playerlist-jar
+          path: project/build/libs/op-playerlist-1.0.0.jar
